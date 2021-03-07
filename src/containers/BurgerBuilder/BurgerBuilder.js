@@ -18,6 +18,12 @@ const BurgerBuilder = () => {
   const [loadingState, setLoadingState] = useState({
     loading: true,
   });
+  const [purchasableState, setPurchasableState] = useState({
+    purchasbale: false,
+  });
+  const [purchasingState, setPurchasingState] = useState({
+    purchasing: false,
+  });
   const [ingredientState, setIngredientState] = useState({
     ingredients: {
       salad: 0,
@@ -25,8 +31,6 @@ const BurgerBuilder = () => {
       cheese: 0,
       meat: 0,
     },
-    purchasable: false,
-    purchasing: false,
   });
   const [totalPriceState, setTotalPrice] = useState({
     totalPrice: 4,
@@ -39,7 +43,7 @@ const BurgerBuilder = () => {
       .reduce((sum, el) => {
         return sum + el;
       }, 0);
-    setIngredientState({ purchasable: sum > 0 });
+    setPurchasableState({ purchasable: sum > 0 });
   };
   const addIngredientHandler = (type) => {
     const oldCount = ingredientState.ingredients[type];
@@ -79,12 +83,12 @@ const BurgerBuilder = () => {
     updatePurchaseState(updateIngredients);
   };
   const purchaseHandler = () => {
-    setIngredientState({
+    setPurchasingState({
       purchasing: true,
     });
   };
   const purchaseCancelHandler = () => {
-    setIngredientState({
+    setPurchasingState({
       purchasing: false,
     });
   };
@@ -110,11 +114,11 @@ const BurgerBuilder = () => {
       .post("/orders.json", order)
       .then((response) => {
         setLoadingState({ loading: false });
-        setIngredientState({ purchasing: false });
+        setPurchasingState({ purchasing: false });
       })
       .catch((error) => {
         setLoadingState({ loading: false });
-        setIngredientState({ purchasing: false });
+        setPurchasingState({ purchasing: false });
       });
   };
 
@@ -138,7 +142,7 @@ const BurgerBuilder = () => {
   return (
     <Aux>
       <Modal
-        show={ingredientState.purchasing}
+        show={purchasingState.purchasing}
         modalClosed={purchaseCancelHandler}
       >
         {orderSummary}
@@ -149,7 +153,7 @@ const BurgerBuilder = () => {
         ingredientRemove={removeIngredientHandler}
         disabled={disabledInfo}
         price={totalPriceState.totalPrice}
-        purchasable={ingredientState.purchasable}
+        purchasable={purchasableState.purchasable}
         ordered={purchaseHandler}
       />
     </Aux>
