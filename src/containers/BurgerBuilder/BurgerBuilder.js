@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Aux from "../../hoc/Auxx";
+import Aux from "../../hoc/Auxx/Auxx";
 import Burger from "../../components/Burger/Burger";
 import BuildControls from "../../components/Burger/BuildControls/BuildControls";
 import Modal from "../../components/UI/Modal/Modal";
@@ -92,7 +92,7 @@ const BurgerBuilder = () => {
       purchasing: false,
     });
   };
-  const PurchaseContinueHandler = () => {
+  const purchaseContinueHandler = () => {
     setLoadingState({
       loading: true,
     });
@@ -115,10 +115,12 @@ const BurgerBuilder = () => {
       .then((response) => {
         setLoadingState({ loading: false });
         setPurchasingState({ purchasing: false });
+        // console.log(response);
       })
       .catch((error) => {
         setLoadingState({ loading: false });
         setPurchasingState({ purchasing: false });
+        // console.log(error);
       });
   };
 
@@ -129,13 +131,13 @@ const BurgerBuilder = () => {
     <OrderSummary
       price={totalPriceState.totalPrice}
       purchaseCanceled={purchaseCancelHandler}
-      purchaseContinued={PurchaseContinueHandler}
+      purchaseContinued={purchaseContinueHandler}
       ingredients={ingredientState.ingredients}
     />
   );
-  if (loadingState.loading) {
-    orderSummary = <Spinner />;
-  }
+  // if (loadingState.loading) {
+  //   orderSummary = <Spinner />;
+  // }
   for (let key in disabledInfo) {
     disabledInfo[key] = disabledInfo[key] <= 0;
   }
