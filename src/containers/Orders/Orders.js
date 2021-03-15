@@ -3,12 +3,8 @@ import Order from "../../components/Order/Order";
 import axios from "../../axios-orders";
 
 const Orders = () => {
-  const [ordersState, setOrderState] = useState({
-    orders: [],
-  });
-  const [loadingState, setLoadingState] = useState({
-    loading: true,
-  });
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     axios
       .get("/orders.json")
@@ -17,22 +13,20 @@ const Orders = () => {
         for (let key in res.data) {
           fetchedOrders.push({ ...res.data[key], id: key });
         }
-        setLoadingState({ loading: false });
-        setOrderState({
-          orders: fetchedOrders,
-        });
+        setLoading(false);
+        setOrders(fetchedOrders);
       })
       .catch((err) => {
-        setLoadingState({ loading: false });
+        setLoading(false);
       });
-  });
+  }, []);
   return (
     <div>
-      {ordersState.orders.map((order) => (
+      {orders.map((order) => (
         <Order
           key={order.id}
           ingredients={order.ingredients}
-          price={order.price}
+          price={order.totalPrice}
         />
       ))}
     </div>

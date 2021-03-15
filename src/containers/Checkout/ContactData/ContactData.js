@@ -6,7 +6,7 @@ import { useHistory } from "react-router-dom";
 import Spinner from "../../../components/UI/Spinner/Spinner";
 import Input from "../../../components/UI/Input/Input";
 
-const ContactData = () => {
+const ContactData = (props) => {
   const [intimateState, setIntimateState] = useState({
     orderForm: {
       name: {
@@ -85,50 +85,48 @@ const ContactData = () => {
           ],
         },
         value: "",
-        validation: {
-          required: true,
-        },
+        validation: {},
+        valid: true,
       },
     },
-
-    loading: false,
+    formIsValid: false,
   });
-
+  const [loading, setLoading] = useState(false);
   const history = useHistory();
 
-  const orderHandler = (event, props) => {
+  const orderHandler = (event) => {
     event.preventDefault();
-    setIntimateState({
-      loading: true,
-    });
+    setLoading(true);
     const formData = {};
     for (let formElementidentifier in intimateState.orderForm) {
       formData[formElementidentifier] =
         intimateState.orderForm[formElementidentifier].value;
     }
-
     const order = {
-      // ingredients: props.ingredients,
-      // price: props.price,
+      ingredients: props.ingredients,
+      price: props.price,
       orderData: formData,
     };
     axios
       .post("/orders.json", order)
       .then((response) => {
-        setIntimateState({ loading: false });
+        setLoading(false);
         history.push("/");
 
         // setPurchasingState({ purchasing: false });
         // console.log(response);
       })
       .catch((error) => {
-        setIntimateState({ loading: false });
+        setLoading(false);
         // setPurchasingState({ purchasing: false });
         // console.log(error);
       });
   };
   const checkValidity = (value, rules) => {
     let isValid = true;
+    if (!rules) {
+      return true;
+    }
     if (rules.required) {
       isValid = value.trim() !== " " && isValid;
     }
@@ -141,6 +139,7 @@ const ContactData = () => {
     return isValid;
   };
   const inputChangedHandler = (event, inputIdentifier) => {
+    // console.log(event.target.value);
     const updateOrderForm = {
       ...intimateState.orderForm,
     };
@@ -152,8 +151,13 @@ const ContactData = () => {
     );
     updateFormElement.touched = true;
     updateOrderForm[inputIdentifier] = updateFormElement;
+    let formIsValid = true;
+    for (let inputIdentifiers in updateOrderForm) {
+      formIsValid = updateOrderForm[inputIdentifier].valid && formIsValid;
+    }
     setIntimateState({
       orderForm: updateOrderForm,
+      formIsValid: formIsValid,
     });
   };
   const formElementsArray = [];
@@ -177,12 +181,16 @@ const ContactData = () => {
           changed={(event) => inputChangedHandler(event, formElement.id)}
         />
       ))}
-      <Button btnType="Success" clicked={orderHandler}>
+      <Button
+        btnType="Success"
+        clicked={orderHandler}
+        disabled={!intimateState.formIsValid}
+      >
         ORDER
       </Button>
     </form>
   );
-  if (intimateState.loading) {
+  if (loading) {
     form = <Spinner />;
   }
   return (

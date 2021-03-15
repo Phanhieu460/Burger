@@ -2,14 +2,14 @@ import React from "react";
 import classes from "./Order.module.css";
 
 const Order = (props) => {
-  const ingredients = [];
+  const ingredient = [];
   for (let ingredientName in props.ingredients) {
-    ingredients.push({
+    ingredient.push({
       name: ingredientName,
       amount: props.ingredients[ingredientName],
     });
   }
-  const ingredientOutput = ingredients.map((ig) => {
+  const ingredientOutput = ingredient.map((ig) => {
     return (
       <span
         style={{
@@ -21,7 +21,7 @@ const Order = (props) => {
         }}
         key={ig.name}
       >
-        {ig.name} ({ig.mount})
+        {ig.name} ({ig.amount})
       </span>
     );
   });
@@ -29,7 +29,8 @@ const Order = (props) => {
     <div className={classes.Order}>
       <p>Ingredients:{ingredientOutput}</p>
       <p>
-        Price:<strong>USD {Number.parseFloat(props.price).toFixed(2)}</strong>
+        Price:
+        <strong>USD {Number.parseFloat(props.price).toFixed(2)}</strong>
       </p>
     </div>
   );
