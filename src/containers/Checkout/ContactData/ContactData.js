@@ -5,6 +5,8 @@ import axios from "../../../axios-orders";
 import { useHistory } from "react-router-dom";
 import Spinner from "../../../components/UI/Spinner/Spinner";
 import Input from "../../../components/UI/Input/Input";
+import { useSelector, useDispatch } from "react-redux";
+import * as actions from "../../../store/actions/index";
 
 const ContactData = (props) => {
   const [intimateState, setIntimateState] = useState({
@@ -84,43 +86,41 @@ const ContactData = (props) => {
             { value: "cheapest", displayValue: "Cheapest" },
           ],
         },
-        value: "",
+        value: "fastest",
         validation: {},
         valid: true,
       },
     },
     formIsValid: false,
   });
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
+
+  const ings = useSelector((state) => {
+    return state.burgerBuilder.ingredients;
+  });
+  const price = useSelector((state) => state.burgerBuilder.totalPrice);
+  const loading = useSelector((state) => state.order.loading);
+
+  const dispatch = useDispatch();
+  const onOrderBurger = (orderData) =>
+    dispatch(actions.purchaseBurger(orderData));
+
   const history = useHistory();
 
   const orderHandler = (event) => {
     event.preventDefault();
-    setLoading(true);
+
     const formData = {};
     for (let formElementidentifier in intimateState.orderForm) {
       formData[formElementidentifier] =
         intimateState.orderForm[formElementidentifier].value;
     }
     const order = {
-      ingredients: props.ingredients,
-      price: props.price,
+      ingredients: ings,
+      price: price,
       orderData: formData,
     };
-    axios
-      .post("/orders.json", order)
-      .then((response) => {
-        setLoading(false);
-        history.push("/");
-
-        // setPurchasingState({ purchasing: false });
-        // console.log(response);
-      })
-      .catch((error) => {
-        setLoading(false);
-        // setPurchasingState({ purchasing: false });
-        // console.log(error);
-      });
+    onOrderBurger(order);
   };
   const checkValidity = (value, rules) => {
     let isValid = true;

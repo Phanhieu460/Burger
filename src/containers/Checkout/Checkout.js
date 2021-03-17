@@ -1,35 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import CheckoutSummry from "../../components/Order/CheckoutSummary/CheckoutSummary";
-import {
-  useHistory,
-  useLocation,
-  Route,
-  useRouteMatch,
-} from "react-router-dom";
+import { useHistory, Route, useRouteMatch, Redirect } from "react-router-dom";
 import ContactData from "../Checkout/ContactData/ContactData";
+import { useSelector } from "react-redux";
 
 const Checkout = (props) => {
-  const [ingredients, setIngredients] = useState(null);
-  const [price, setPrice] = useState(0);
+  // const [ingredients, setIngredients] = useState(null);
+  // const [price, setPrice] = useState(0);
 
-  let location = useLocation();
+  // let location = useLocation();
   let match = useRouteMatch();
 
-  useEffect(() => {
-    const query = new URLSearchParams(location.search);
-    const ingredient = {};
-    let price = 0;
-    for (let param of query.entries()) {
-      if (param[0] === "price") {
-        price = +param[1];
-      } else {
-        ingredient[param[0]] = +param[1];
-      }
-      // ingredients[param[0]] = +param[1];
-    }
-    setIngredients(ingredient);
-    setPrice(price);
-  }, []);
+  const ings = useSelector((state) => {
+    return state.burgerBuilder.ingredients;
+  });
+  const purchased = useSelector((state) => {
+    return state.order.purchased;
+  });
+
+  // useEffect(() => {
+  //
+  // }, []);
   const history = useHistory();
   const checkoutCancelledHandler = () => {
     history.goBack();
@@ -37,19 +28,23 @@ const Checkout = (props) => {
   const checkoutContinuedHandler = () => {
     history.replace("/checkout/contact-data");
   };
-  return (
-    <div>
-      <CheckoutSummry
-        ingredients={ingredients}
-        checkoutCancelled={checkoutCancelledHandler}
-        checkoutContinued={checkoutContinuedHandler}
-      />
-      <Route
-        path={match.path + "/contact-data"}
-        render={() => <ContactData ingredients={ingredients} price={price} />}
-      />
-    </div>
-  );
+  let summary = <Redirect to="/" />;
+
+  if (ings) {
+    const purchaseRedirect = purchased ? <Redirect to="/" /> : null;
+    summary = (
+      <div>
+        {purchaseRedirect}
+        <CheckoutSummry
+          ingredients={ings}
+          checkoutCancelled={checkoutCancelledHandler}
+          checkoutContinued={checkoutContinuedHandler}
+        />
+        <Route path={match.path + "/contact-data"} component={ContactData} />
+      </div>
+    );
+  }
+  return summary;
 };
 
 export default Checkout;
