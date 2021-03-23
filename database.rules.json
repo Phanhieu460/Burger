@@ -1,7 +1,15 @@
 {
-  
   "rules": {
-    ".read": false,
-    ".write": false
+    "ingredients": {
+      ".read": "true",
+      ".write": "true"
+    },
+    "orders": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": [
+        "userId"
+      ]
+    }
   }
 }
