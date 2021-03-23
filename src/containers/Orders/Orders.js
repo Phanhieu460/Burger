@@ -6,16 +6,16 @@ import * as actions from "../../store/actions/index";
 import Spinner from "../../components/UI/Spinner/Spinner";
 
 const Orders = () => {
-  // const [orders, setOrders] = useState([]);
-  // const [loading, setLoading] = useState(true);
-
   const orders = useSelector((state) => state.order.orders);
   const loading = useSelector((state) => state.order.loading);
+  const token = useSelector((state) => state.auth.token);
+  const userId = useSelector((state) => state.auth.userId);
 
   const dispatch = useDispatch();
-  const onFetchOrders = () => dispatch(actions.fetchOrders());
+  const onFetchOrders = (token, userId) =>
+    dispatch(actions.fetchOrders(token, userId));
   useEffect(() => {
-    onFetchOrders();
+    onFetchOrders(token, userId);
   }, []);
 
   let Orders = <Spinner />;

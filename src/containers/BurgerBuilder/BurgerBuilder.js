@@ -12,11 +12,11 @@ import { useDispatch, useSelector } from "react-redux";
 import * as burgerBuilderAction from "../../store/actions/index";
 
 const BurgerBuilder = () => {
-  const [purchasable, setPurchasable] = useState(false);
+  //const [purchasable, setPurchasable] = useState(false);
   const [purchasing, setPurchasing] = useState(false);
-  const [ingredients, setIngredients] = useState(null);
-  const [totalPrice, setTotalPrice] = useState(4);
-  const [errorState, setErrorState] = useState(false);
+  // const [ingredients, setIngredients] = useState(null);
+  // const [totalPrice, setTotalPrice] = useState(4);
+  // const [errorState, setErrorState] = useState(false);
   const [loading, setLoading] = useState(true);
   const history = useHistory();
 
@@ -26,6 +26,7 @@ const BurgerBuilder = () => {
   });
   const price = useSelector((state) => state.burgerBuilder.totalPrice);
   const error = useSelector((state) => state.burgerBuilder.error);
+  const isAuthenticate = useSelector((state) => state.auth.token !== null);
 
   const onIngredientAdded = (ingName) =>
     dispatch(burgerBuilderAction.addIngredient(ingName));
@@ -34,6 +35,8 @@ const BurgerBuilder = () => {
   const onInitIngredients = () =>
     dispatch(burgerBuilderAction.initIngredients());
   const onInitPurchase = () => dispatch(burgerBuilderAction.purchaseInit());
+  const onSetRedirectPath = (path) =>
+    dispatch(burgerBuilderAction.setAuthRedirectPath(path));
 
   useEffect(() => {
     onInitIngredients();
@@ -84,8 +87,12 @@ const BurgerBuilder = () => {
   //   updatePurchaseState(updateIngredients);
   // };
   const purchaseHandler = () => {
-    setPurchasing(true);
-    // console.log(ingredients);
+    if (isAuthenticate) {
+      setPurchasing(true);
+    } else {
+      onSetRedirectPath("/checkout");
+      history.push("/auth");
+    }
   };
   const purchaseCancelHandler = () => {
     setPurchasing(false);
@@ -107,9 +114,9 @@ const BurgerBuilder = () => {
     ...ings,
   };
   let orderSummary = null;
-  // if (loading) {
-  //   orderSummary = <Spinner />;
-  // }
+  if (loading) {
+    orderSummary = <Spinner />;
+  }
   let burger = error ? <p>Ingredient can`t be loaded</p> : <Spinner />;
   if (ings) {
     burger = (
@@ -122,6 +129,7 @@ const BurgerBuilder = () => {
           price={price}
           purchasable={updatePurchaseState(ings)}
           ordered={purchaseHandler}
+          isAuth={isAuthenticate}
         />
       </Aux>
     );

@@ -100,10 +100,12 @@ const ContactData = (props) => {
   });
   const price = useSelector((state) => state.burgerBuilder.totalPrice);
   const loading = useSelector((state) => state.order.loading);
+  const token = useSelector((state) => state.auth.token);
+  const userId = useSelector((state) => state.auth.userId);
 
   const dispatch = useDispatch();
-  const onOrderBurger = (orderData) =>
-    dispatch(actions.purchaseBurger(orderData));
+  const onOrderBurger = (orderData, token) =>
+    dispatch(actions.purchaseBurger(orderData, token));
 
   const history = useHistory();
 
@@ -119,8 +121,9 @@ const ContactData = (props) => {
       ingredients: ings,
       price: price,
       orderData: formData,
+      userId: userId,
     };
-    onOrderBurger(order);
+    onOrderBurger(order, token);
   };
   const checkValidity = (value, rules) => {
     let isValid = true;
